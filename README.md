@@ -13,7 +13,7 @@ End users frequently report issues connecting to a set of remote PCs. This scrip
 ## Usage
 
 ```powershell
-.\remote_pc_check.ps1 -Username [username]
+.\rdp_connection_diagnostic.ps1 -Username [username]
 ```
 
 `-Username` accepts a bare name, a `DOMAIN\user`, or a `user@domain` format.
@@ -27,7 +27,7 @@ End users frequently report issues connecting to a set of remote PCs. This scrip
 | `-RdpPort` | `3389` | TCP port checked for an RDP listener. |
 
 ```powershell
-.\remote_pc_check.ps1 -Username janedoe -MaxSessions 3 -DomainPrefix CONTOSO
+.\rdp_connection_diagnostic.ps1 -Username janedoe -MaxSessions 3 -DomainPrefix CONTOSO
 ```
 
 ## Output
