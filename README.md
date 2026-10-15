@@ -1,29 +1,31 @@
-# Remote PC Connection Troubleshooting Script
+# RDP Connection Diagnostic
 
-An automated script intended for use by 1st line support to detect and resolve common causes of remote PC connection issues.
+A read-only PowerShell script for first-line support. It checks a remote PC for common causes of RDP connection and sign-in failures, and suggests a fix when it finds one.
 
-End users frequently report issues connecting to a set of remote PCs. This script has been designed to check for common causes of connection issues, and suggest a resolution if the cause is found. It facilitates first line investigation and resolution, reducing the time to resolution and the number of tickets requiring second line escalation.
+Users of a shared pool of remote PCs often report that they cannot connect. The script checks the common machine-side causes, so first line can often resolve the issue without escalating to second line.
 
 ## Requirements
 
-- PowerShell 5.1+
-- Remote connection to the remote PC with local administrator permissions
-- Must run directly on the remote PC that the user reports they cannot access
+- PowerShell 5.1 or later
+- Local administrator rights on the remote PC
+- Script execution allowed by the PC's PowerShell execution policy
+
+Run the script on the remote PC that the user cannot connect to, over your own remote connection to that PC.
 
 ## Usage
 
 ```powershell
-.\rdp_connection_diagnostic.ps1 -Username [username]
+.\rdp_connection_diagnostic.ps1 -Username janedoe
 ```
 
-`-Username` accepts a bare name, a `DOMAIN\user`, or a `user@domain` format.
+`-Username` accepts a bare name, `DOMAIN\user` or `user@domain`.
 
 **Optional parameters**
 
 | Parameter | Default | Purpose |
 |---|---|---|
-| `-MaxSessions` | `2` | Maximum concurrent sessions the machine is expected to support. |
-| `-DomainPrefix` | `AzureAD` | Join prefix used when building the group-add remediation command. Use the NetBIOS domain name for an on-premises domain. |
+| `-MaxSessions` | `2` | Maximum number of concurrent sessions the PC is expected to support. |
+| `-DomainPrefix` | `AzureAD` | Prefix used to build the suggested group-add command. Use the NetBIOS domain name for an on-premises domain. |
 | `-RdpPort` | `3389` | TCP port checked for an RDP listener. |
 
 ```powershell
@@ -34,17 +36,17 @@ End users frequently report issues connecting to a set of remote PCs. This scrip
 
 | Field | Meaning |
 |---|---|
-| `TargetUser` | The user account being used for the queries. |
-| `InRdpGroup` | Whether the user is in the local group required to enable RDP connections. |
-| `CapacityReached` | Whether the concurrent-session limit (two by default) is fully occupied by other users. |
-| `UserHasActiveSession` | Whether the target user already has an active session, which may indicate an unresponsive or hung session blocking sign in. |
-| `RdpEnabled` | Whether RDP is enabled on the remote PC. |
+| `TargetUser` | The user account the checks were run for. |
+| `InRdpGroup` | Whether the user is in the local Remote Desktop Users group. |
+| `CapacityReached` | Whether other users already occupy every concurrent session (`-MaxSessions`, default 2). |
+| `UserHasActiveSession` | Whether the user already has an active session, which may be a hung session blocking sign-in. |
+| `RdpEnabled` | Whether RDP is enabled on the PC. |
 | `ServiceRunning` | Whether the RDP service is running. |
 | `PortListening` | Whether the RDP port is listening. |
 
-If a cause is identified (e.g. the user is not in the correct local group), a remediation step is suggested. The script is **read only** — no remediation steps are carried out by the script itself, and the remediation block is omitted entirely when no fixable cause is found.
+If the script finds a fixable cause, such as the user not being in the Remote Desktop Users group, it prints a suggested remediation command. The script is read-only. It makes no changes itself, and it leaves out the remediation block when it finds no fixable cause.
 
-**Sample**
+**Sample output**
 
 ```text
 TargetUser           : JaneDoe
@@ -62,6 +64,10 @@ User is NOT in the Remote Desktop Users group. Add them with:
 
 ## Limitations
 
-- Checks machine-side causes only. Cannot see the network path.
-- quser truncates very long usernames, which may affect matching in edge cases.
-- The group-add remediation assumes the account resolves under the given prefix. SID-resolution issues may require adding by object ID instead.
+- Checks machine-side causes only. It cannot see the network path between the user and the PC.
+- `quser` truncates very long usernames, which can affect session matching in edge cases.
+- The suggested group-add command assumes the account resolves under the given prefix. If SID resolution fails, add the account by object ID instead.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).
