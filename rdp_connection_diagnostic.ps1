@@ -36,18 +36,18 @@
     The TCP port to check for an RDP listener. Defaults to 3389.
 
 .EXAMPLE
-    .\remote_pc_check.ps1 -Username jdoe
+    .\rdp_connection_diagnostic.ps1 -Username jdoe
 
     Runs all checks for user "jdoe" using the default two-session limit and RDP port 3389.
 
 .EXAMPLE
-    powershell -ExecutionPolicy Bypass -File .\remote_pc_check.ps1 -Username DOMAIN\jdoe
+    powershell -ExecutionPolicy Bypass -File .\rdp_connection_diagnostic.ps1 -Username DOMAIN\jdoe
 
     Typical invocation from a remote management console where the script execution policy
     may otherwise block it.
 
 .EXAMPLE
-    .\remote_pc_check.ps1 -Username jdoe -MaxSessions 3 -DomainPrefix CONTOSO
+    .\rdp_connection_diagnostic.ps1 -Username jdoe -MaxSessions 3 -DomainPrefix CONTOSO
 
     Checks against a three-session limit and builds the group-add command for an
     on-premises domain named CONTOSO.
