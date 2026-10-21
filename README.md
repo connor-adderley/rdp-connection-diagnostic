@@ -67,6 +67,7 @@ User is NOT in the Remote Desktop Users group. Add them with:
 - Checks machine-side causes only. It cannot see the network path between the user and the PC.
 - `quser` truncates very long usernames, which can affect session matching in edge cases.
 - The suggested group-add command assumes the account resolves under the given prefix. If SID resolution fails, add the account by object ID instead.
+- Checks direct members of the Remote Desktop Users group only. A user who has access through a group shows as not in the group.
 
 ## Licence
 
